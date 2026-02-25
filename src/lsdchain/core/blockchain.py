@@ -39,13 +39,16 @@ class Blockchain:
                 balance -= tx.valor
         return balance
 
-    def _get_chain_balances(self) -> dict[str, float]:
+    def _get_chain_balances(self, target_chain: list[Block] | None = None) -> dict[str, float]:
+        if target_chain is None:
+            target_chain = self.chain
+                    
         balances: dict[str, float] = defaultdict(float)
-        for block in self.chain:
+        for block in target_chain:
             for tx in block.transactions:
                 balances[tx.destino] += tx.valor
                 balances[tx.origem] -= tx.valor
-        return balances
+            return balances
 
     def add_transaction(self, transaction: Transaction) -> bool:
         if self._is_duplicate(transaction):
@@ -100,7 +103,7 @@ class Blockchain:
             return False
         return True
 
-    def _validate_block_transactions(self, block: Block) -> bool:
+    def _validate_block_transactions(self, block: Block, target_chain: list[Block] | None = None) -> bool:
         if not block.transactions:
             return False
 
@@ -112,7 +115,7 @@ class Blockchain:
         if first.timestamp != block.timestamp:
             return False
 
-        balances = self._get_chain_balances()
+        balances = self._get_chain_balances(target_chain)
         for idx, tx in enumerate(block.transactions):
             if not self._validate_transaction_basic(tx):
                 return False
@@ -151,7 +154,7 @@ class Blockchain:
                 return False
             if not current.is_valid_pow(DIFFICULTY_PREFIX):
                 return False
-            if not self._validate_block_transactions(current):
+            if not self._validate_block_transactions(current, target_chain=chain[:i]):
                 return False
         return True
 
