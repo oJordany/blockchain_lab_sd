@@ -27,6 +27,7 @@ class Transaction:
     timestamp: float = field(default_factory=time.time)
 
     def __post_init__(self) -> None:
+        # Regras basicas: enderecos obrigatorios e valor positivo.
         if not self.origem or not self.destino:
             raise ValueError("Origem e destino sao obrigatorios")
         if self.valor <= 0:

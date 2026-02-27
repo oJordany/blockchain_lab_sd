@@ -26,6 +26,7 @@ class Miner:
         if transactions is None:
             transactions = list(self.blockchain.pending_transactions)
 
+        # Coinbase: primeira transacao do bloco, cria novas moedas.
         block_timestamp = time.time()
         reward_tx = Transaction(
             origem=COINBASE_SENDER,
@@ -35,6 +36,7 @@ class Miner:
         )
         block_transactions = [reward_tx] + transactions
 
+        # Bloco candidato; o nonce sera ajustado ate satisfazer o PoW.
         block = Block(
             index=len(self.blockchain.chain),
             previous_hash=self.blockchain.last_block.hash,

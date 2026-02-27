@@ -184,12 +184,14 @@ class BlockchainApp:
             self._log("Porta invalida.")
             return
 
+        # Cria o no local e inicia o servidor TCP.
         self.node = Node(host=host, port=port)
         self.node.start()
         self._log(f"No iniciado em {host}:{port}")
         self.start_button.configure(state="disabled")
         self._set_actions_state(True)
 
+        # Conecta em bootstrap(s) para descobrir/sincronizar a blockchain.
         bootstrap_raw = self.bootstrap_var.get().strip()
         if bootstrap_raw:
             for peer in self._parse_peers(bootstrap_raw):
@@ -199,6 +201,7 @@ class BlockchainApp:
                 if self.node.connect_to_peer(peer):
                     self._log(f"Conectado ao bootstrap {peer}")
 
+        # Se houver peers, pede a cadeia e sincroniza.
         if self.node.peers:
             self._log("Sincronizando blockchain...")
             self.node.sync_blockchain()
@@ -232,6 +235,7 @@ class BlockchainApp:
             if saldo < valor:
                 self._log(f"Saldo insuficiente: {saldo} < {valor}")
                 return
+        # Adiciona no pool local e propaga para os peers.
         if self.node.broadcast_transaction(tx):
             self._log(f"Transacao enviada: {tx.id}")
         else:
@@ -255,6 +259,7 @@ class BlockchainApp:
             return
 
         def run_mine() -> None:
+            # Mineracao em thread separada para nao travar a GUI.
             self._log("Mineracao iniciada...")
             start = time.time()
             block = self.node.mine()
@@ -289,6 +294,7 @@ class BlockchainApp:
         if not is_host_port_address(address):
             self._log("Endereco invalido. Use o formato host:porta.")
             return
+        # Saldo calculado localmente a partir da blockchain replicada.
         balance = self.node.blockchain.get_balance(address)
         self._log(f"Saldo de {address}: {balance}")
 
@@ -314,6 +320,7 @@ class BlockchainApp:
         if not is_host_port_address(peer):
             self._log("Endereco invalido. Use o formato host:porta.")
             return
+        # Conexao manual a um peer especifico.
         if self.node.connect_to_peer(peer):
             self._log(f"Conectado ao peer {peer}")
         else:
@@ -323,6 +330,7 @@ class BlockchainApp:
         if not self.node:
             self._log("Inicie o no primeiro.")
             return
+        # Solicita a cadeia aos peers e substitui se houver uma maior.
         self._log("Sincronizando blockchain...")
         self.node.sync_blockchain()
         self._log(f"Blockchain com {len(self.node.blockchain.chain)} blocos")

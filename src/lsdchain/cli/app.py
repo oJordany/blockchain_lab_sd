@@ -54,6 +54,7 @@ def _create_transaction(node: Node) -> None:
             if saldo < valor:
                 print(f"Saldo insuficiente: {saldo} < {valor}")
                 return
+        # Adiciona no pool local e propaga para os peers.
         if node.broadcast_transaction(tx):
             print(f"Transacao criada: {tx.id[:8]}...")
         else:
@@ -75,6 +76,7 @@ def _mine_block(node: Node) -> None:
     count = len(node.blockchain.pending_transactions)
     print(f"\nMinerando bloco com {count} transacao(oes) + coinbase...")
     start = time.time()
+    # PoW cria um bloco usando as pendentes atuais.
     block = node.mine()
     elapsed = time.time() - start
     if block:
@@ -103,6 +105,7 @@ def _show_balance(node: Node) -> None:
     if not is_host_port_address(address):
         print("Endereco invalido. Use o formato host:porta.")
         return
+    # Saldo calculado localmente a partir da blockchain replicada.
     balance = node.blockchain.get_balance(address)
     print(f"Saldo de {address}: {balance}")
 
@@ -121,6 +124,7 @@ def _connect_peer(node: Node) -> None:
     if not is_host_port_address(peer):
         print("Endereco invalido. Use o formato host:porta.")
         return
+    # Conexao manual a um peer especifico.
     if node.connect_to_peer(peer):
         print(f"Conectado a {peer}")
     else:

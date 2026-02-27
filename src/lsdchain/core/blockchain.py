@@ -63,6 +63,7 @@ class Blockchain:
         return balances
 
     def add_transaction(self, transaction: Transaction) -> bool:
+        # Valida regras basicas e saldo antes de aceitar no pool.
         if self._is_duplicate(transaction):
             return False
         if not self._validate_transaction_basic(transaction):
@@ -92,6 +93,7 @@ class Blockchain:
             return False
 
     def add_block(self, block: Block) -> bool:
+        # Aceita o bloco apenas se for valido e remove pendentes incluidas.
         if not self.is_valid_block(block):
             return False
 
@@ -103,6 +105,7 @@ class Blockchain:
         return True
 
     def is_valid_block(self, block: Block) -> bool:
+        # Valida encadeamento, hash, PoW e transacoes do bloco.
         if block.index != len(self.chain):
             return False
         if block.previous_hash != self.last_block.hash:
@@ -116,6 +119,7 @@ class Blockchain:
         return True
 
     def _validate_block_transactions(self, block: Block, target_chain: list[Block] | None = None) -> bool:
+        # Coinbase deve ser a primeira transacao e cria a recompensa.
         if not block.transactions:
             return False
 
@@ -136,6 +140,7 @@ class Blockchain:
                 continue
             if tx.origem == COINBASE_SENDER:
                 return False
+            # Garante que a origem nao fique negativa.
             if balances[tx.origem] < tx.valor:
                 return False
             balances[tx.origem] -= tx.valor
@@ -171,6 +176,7 @@ class Blockchain:
         return True
 
     def replace_chain(self, new_chain: list[Block]) -> bool:
+        # Consenso simples: cadeia mais longa e valida vence.
         if len(new_chain) <= len(self.chain):
             return False
         if not self.is_valid_chain(new_chain):

@@ -30,6 +30,7 @@ class Block:
             self.hash = self.calculate_hash()
 
     def calculate_hash(self) -> str:
+        # Hash SHA-256 com JSON ordenado (sort_keys=True) para interoperabilidade.
         block_data = {
             "index": self.index,
             "previous_hash": self.previous_hash,
@@ -63,6 +64,7 @@ class Block:
 
     @classmethod
     def create_genesis(cls) -> "Block":
+        # Bloco genesis fixo conforme o padrao do trabalho.
         genesis = cls(
             index=0,
             previous_hash=GENESIS_PREVIOUS_HASH,

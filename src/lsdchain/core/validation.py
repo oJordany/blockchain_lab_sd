@@ -4,6 +4,7 @@ from __future__ import annotations
 
 
 def is_host_port_address(address: str) -> bool:
+    # Valida formato simples host:porta (porta 1-65535).
     address = address.strip()
     if not address:
         return False
