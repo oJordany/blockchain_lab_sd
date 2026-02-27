@@ -11,8 +11,21 @@ SRC_PATH = os.path.join(ROOT, "src")
 if SRC_PATH not in sys.path:
     sys.path.insert(0, SRC_PATH)
 
-from lsdchain.cli.app import run
+
+def main() -> None:
+    if "--cli" in sys.argv:
+        sys.argv.remove("--cli")
+        # Modo texto explicito: usa o menu CLI para ambientes sem GUI.
+        from lsdchain.cli.app import run as run_cli
+
+        run_cli()
+        return
+
+    # GUI e o modo padrao; se Tkinter estiver disponivel, abre a interface.
+    from lsdchain.gui.app_tk import run as run_gui
+
+    run_gui()
 
 
 if __name__ == "__main__":
-    run()
+    main()

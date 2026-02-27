@@ -11,7 +11,7 @@ import time
 from .transaction import Transaction
 
 GENESIS_PREVIOUS_HASH = "0" * 64
-GENESIS_HASH = "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7"
+GENESIS_HASH = "0567c32b97c36a70d3f4cb865710d329a0be5d713c8cb1b8c769fbaf89f1afb7"
 
 
 @dataclass
@@ -30,6 +30,7 @@ class Block:
             self.hash = self.calculate_hash()
 
     def calculate_hash(self) -> str:
+        # Hash SHA-256 com JSON ordenado (sort_keys=True) para interoperabilidade.
         block_data = {
             "index": self.index,
             "previous_hash": self.previous_hash,
@@ -63,6 +64,7 @@ class Block:
 
     @classmethod # decorator de classe, usado para criar o bloco genesis. n precisar de uma instância, chamado diretamente na classe.
     def create_genesis(cls) -> "Block":
+        # Bloco genesis fixo conforme o padrao do trabalho.
         genesis = cls(
             index=0,
             previous_hash=GENESIS_PREVIOUS_HASH,

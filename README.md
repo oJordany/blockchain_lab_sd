@@ -16,34 +16,40 @@ Este projeto implementa uma criptomoeda/transacao distribuida simplificada, segu
 - Validacao de cadeia, consenso por cadeia mais longa e sincronizacao (`src/lsdchain/core/blockchain.py`, `src/lsdchain/network/node.py`).
 
 ## Como executar (Python)
-1. Instale Python 3.11+.
+1. Instale Python 3.11+ com Tkinter.
 2. Dependencias:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Inicie um no:
+3. Inicie um no (interface Tkinter):
 
 ```bash
-python main.py --host 127.0.0.1 --port 5000
+python main.py
 ```
 
-4. Inicie outros nos com bootstrap:
+4. Se precisar modo texto (sem GUI):
 
 ```bash
-python main.py --host 127.0.0.1 --port 5001 --bootstrap 127.0.0.1:5000
-python main.py --host 127.0.0.1 --port 5002 --bootstrap 127.0.0.1:5000
+python main.py --cli --host 127.0.0.1 --port 5000
+```
+
+5. Inicie outros nos com bootstrap (modo texto):
+
+```bash
+python main.py --cli --host 127.0.0.1 --port 5001 --bootstrap 127.0.0.1:5000
+python main.py --cli --host 127.0.0.1 --port 5002 --bootstrap 127.0.0.1:5000
 ```
 
 ## Como executar (Docker)
-Build e execucao com tres nos de exemplo:
+Build e execucao com tres nos de exemplo (modo texto):
 
 ```bash
 docker compose up --build
 ```
 
-Cada service abre um menu interativo no terminal. Se precisar, use `docker attach <container>` para interagir.
+Cada service executa em modo texto (`--cli`). Interface Tkinter exige ambiente grafico local.
 
 ## Protocolo de comunicacao (Padrao_blockchain.pdf)
 - Transmissao: `[4 bytes tamanho big-endian][JSON UTF-8]`.
@@ -74,8 +80,9 @@ Conceitos basicos (em linguagem simples):
 - **Consenso**: e a regra para decidir qual cadeia e aceita. Aqui, vence a cadeia valida com mais blocos (`src/lsdchain/core/blockchain.py`).
 
 ## Estrutura de pastas (e papel de cada componente)
-- `main.py`: ponto de entrada que carrega o CLI.
-- `src/lsdchain/cli/app.py`: menu interativo e acoes do usuario.
+- `main.py`: ponto de entrada que carrega a interface Tkinter (ou CLI com `--cli`).
+- `src/lsdchain/cli/app.py`: menu em modo texto (opcional).
+- `src/lsdchain/gui/app_tk.py`: interface Tkinter.
 - `src/lsdchain/network/node.py`: no P2P, sockets, broadcast, sincronizacao.
 - `src/lsdchain/network/protocol.py`: formato e tipos de mensagens.
 - `src/lsdchain/core/blockchain.py`: validacao de cadeia, saldo e consenso.
@@ -87,12 +94,12 @@ Conceitos basicos (em linguagem simples):
 ## Fluxo do sistema (passo a passo)
 ### 1) Inicializacao do no
 1. O usuario executa `python main.py`.
-2. `main.py` chama o CLI (`src/lsdchain/cli/app.py`).
-3. O CLI cria o no (`src/lsdchain/network/node.py`) e inicia o servidor TCP.
+2. `main.py` chama a interface Tkinter (`src/lsdchain/gui/app_tk.py`) ou o CLI com `--cli`.
+3. A interface cria o no (`src/lsdchain/network/node.py`) e inicia o servidor TCP.
 4. Se houver `--bootstrap`, o no envia `REQUEST_CHAIN` e sincroniza.
 
 ### 2) Criar transacao
-1. Menu chama `_create_transaction` em `src/lsdchain/cli/app.py`.
+1. A interface chama `_create_transaction` em `src/lsdchain/gui/app_tk.py` (ou `src/lsdchain/cli/app.py` no modo texto).
 2. A transacao e criada em `src/lsdchain/core/transaction.py`.
 3. `Node.broadcast_transaction` valida saldo em `src/lsdchain/core/blockchain.py`.
 4. O no propaga `NEW_TRANSACTION` para os peers (`src/lsdchain/network/protocol.py`).
