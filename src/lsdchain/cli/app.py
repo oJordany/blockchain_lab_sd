@@ -6,6 +6,7 @@ import argparse
 import time
 
 from ..core.transaction import Transaction
+from ..core.validation import is_host_port_address
 from ..network.node import Node
 
 
@@ -42,6 +43,9 @@ def _create_transaction(node: Node) -> None:
     print("\n--- Nova Transacao ---")
     origem = input("Origem: ").strip()
     destino = input("Destino: ").strip()
+    if not is_host_port_address(origem) or not is_host_port_address(destino):
+        print("Endereco invalido. Use o formato host:porta.")
+        return
     try:
         valor = float(input("Valor: ").strip())
         tx = Transaction(origem=origem, destino=destino, valor=valor)
@@ -96,6 +100,9 @@ def _show_blockchain(node: Node) -> None:
 
 def _show_balance(node: Node) -> None:
     address = input("\nEndereco: ").strip()
+    if not is_host_port_address(address):
+        print("Endereco invalido. Use o formato host:porta.")
+        return
     balance = node.blockchain.get_balance(address)
     print(f"Saldo de {address}: {balance}")
 
@@ -111,6 +118,9 @@ def _show_peers(node: Node) -> None:
 
 def _connect_peer(node: Node) -> None:
     peer = input("\nEndereco do peer (host:port): ").strip()
+    if not is_host_port_address(peer):
+        print("Endereco invalido. Use o formato host:porta.")
+        return
     if node.connect_to_peer(peer):
         print(f"Conectado a {peer}")
     else:

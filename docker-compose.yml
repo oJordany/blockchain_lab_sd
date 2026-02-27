@@ -1,7 +1,7 @@
 services:
   node1:
     build: .
-    command: ["--host", "0.0.0.0", "--port", "5000"]
+    command: ["--cli", "--host", "0.0.0.0", "--port", "5000"]
     ports:
       - "5000:5000"
     stdin_open: true
@@ -9,7 +9,8 @@ services:
 
   node2:
     build: .
-    command: ["--host", "0.0.0.0", "--port", "5001", "--bootstrap", "node1:5000"]
+    command:
+      ["--cli", "--host", "0.0.0.0", "--port", "5001", "--bootstrap", "node1:5000"]
     ports:
       - "5001:5001"
     depends_on:
@@ -19,7 +20,8 @@ services:
 
   node3:
     build: .
-    command: ["--host", "0.0.0.0", "--port", "5002", "--bootstrap", "node1:5000"]
+    command:
+      ["--cli", "--host", "0.0.0.0", "--port", "5002", "--bootstrap", "node1:5000"]
     ports:
       - "5002:5002"
     depends_on:

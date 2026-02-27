@@ -11,7 +11,7 @@ import time
 from .transaction import Transaction
 
 GENESIS_PREVIOUS_HASH = "0" * 64
-GENESIS_HASH = "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7"
+GENESIS_HASH = "0567c32b97c36a70d3f4cb865710d329a0be5d713c8cb1b8c769fbaf89f1afb7"
 
 
 @dataclass

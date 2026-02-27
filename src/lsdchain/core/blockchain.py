@@ -39,16 +39,28 @@ class Blockchain:
                 balance -= tx.valor
         return balance
 
-    def _get_chain_balances(self, target_chain: list[Block] | None = None) -> dict[str, float]:
+    def has_address(self, address: str) -> bool:
+        for block in self.chain:
+            for tx in block.transactions:
+                if tx.origem == address or tx.destino == address:
+                    return True
+        for tx in self.pending_transactions:
+            if tx.origem == address or tx.destino == address:
+                return True
+        return False
+
+    def _get_chain_balances(
+        self, target_chain: list[Block] | None = None
+    ) -> dict[str, float]:
         if target_chain is None:
             target_chain = self.chain
-                    
+
         balances: dict[str, float] = defaultdict(float)
         for block in target_chain:
             for tx in block.transactions:
                 balances[tx.destino] += tx.valor
                 balances[tx.origem] -= tx.valor
-            return balances
+        return balances
 
     def add_transaction(self, transaction: Transaction) -> bool:
         if self._is_duplicate(transaction):
