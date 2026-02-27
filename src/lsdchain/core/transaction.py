@@ -28,9 +28,9 @@ class Transaction:
 
     def __post_init__(self) -> None:
         if not self.origem or not self.destino:
-            raise ValueError("Origem e destino sao obrigatorios")
+            raise ValueError("Origem e destino são obrigatorios. Faça o ajuste e tente novamente.")
         if self.valor <= 0:
-            raise ValueError("Valor da transacao deve ser positivo")
+            raise ValueError("Valor da transaçãoo deve ser positivo. Faça o ajuste e tente novamente.")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -52,9 +52,9 @@ class Transaction:
         )
 
     def __hash__(self) -> int:
-        return hash(self.id)
+        return hash(self.id) ## evita que a msm transação seja add duas vezes no pool de pendentes ou no msm bloco.
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: object) -> bool: # -usar no blockchain pra evitar transações duplicadas no pool de pendentes ou msm bloco. -usar na rede pra evitar
         if isinstance(other, Transaction):
             return self.id == other.id
         return False
