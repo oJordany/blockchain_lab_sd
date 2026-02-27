@@ -44,10 +44,6 @@ class Blockchain:
                 balance -= tx.valor
         return balance
 
-<<<<<<< HEAD
-    def _get_chain_balances(self, target_chain: list[Block] | None = None) -> dict[str, float]:
-        """Gera um dicionario de saldos de todos os endereços de uma determinada corrente."""
-=======
     def has_address(self, address: str) -> bool:
         for block in self.chain:
             for tx in block.transactions:
@@ -61,7 +57,6 @@ class Blockchain:
     def _get_chain_balances(
         self, target_chain: list[Block] | None = None
     ) -> dict[str, float]:
->>>>>>> feat/gui
         if target_chain is None:
             target_chain = self.chain
 
@@ -74,14 +69,8 @@ class Blockchain:
 
     # funções pra gestão de transações
     def add_transaction(self, transaction: Transaction) -> bool:
-<<<<<<< HEAD
-        """Valida e add uma nova transacao ao pool de pendentes."""
-
-        if self._is_duplicate(transaction): ## msm id
-=======
         # Valida regras basicas e saldo antes de aceitar no pool.
         if self._is_duplicate(transaction):
->>>>>>> feat/gui
             return False
         
         if not self._validate_transaction_basic(transaction):# verifica campos básicos ( valores positivos e existencia de enderecos)
@@ -117,11 +106,7 @@ class Blockchain:
 
     ## gestão de bloco 
     def add_block(self, block: Block) -> bool:
-<<<<<<< HEAD
-        """Valida e anexa um novo bloco minerado a corrente oficial."""
-=======
         # Aceita o bloco apenas se for valido e remove pendentes incluidas.
->>>>>>> feat/gui
         if not self.is_valid_block(block):
             return False
 
@@ -133,13 +118,8 @@ class Blockchain:
         return True
 
     def is_valid_block(self, block: Block) -> bool:
-<<<<<<< HEAD
-        """Verifica se um bloco segue todas as regras de integridade e Proof of Work."""
-        if block.index != len(self.chain): # indice segue a ordem correta
-=======
         # Valida encadeamento, hash, PoW e transacoes do bloco.
         if block.index != len(self.chain):
->>>>>>> feat/gui
             return False
         if block.previous_hash != self.last_block.hash:
             return False
@@ -152,11 +132,7 @@ class Blockchain:
         return True
 
     def _validate_block_transactions(self, block: Block, target_chain: list[Block] | None = None) -> bool:
-<<<<<<< HEAD
-        """Valida a legalidade de todas as transacoes dentro de um bloco especifico."""
-=======
         # Coinbase deve ser a primeira transacao e cria a recompensa.
->>>>>>> feat/gui
         if not block.transactions:
             return False
 
@@ -214,11 +190,7 @@ class Blockchain:
         return True
 
     def replace_chain(self, new_chain: list[Block]) -> bool:
-<<<<<<< HEAD
-        """Implementa o consenso: a maior cadeia valida substitui a atual."""
-=======
         # Consenso simples: cadeia mais longa e valida vence.
->>>>>>> feat/gui
         if len(new_chain) <= len(self.chain):
             return False
         if not self.is_valid_chain(new_chain):
