@@ -61,7 +61,7 @@ class Block:
             hash=str(data["hash"]),
         )
 
-    @classmethod
+    @classmethod # decorator de classe, usado para criar o bloco genesis. n precisar de uma instância, chamado diretamente na classe.
     def create_genesis(cls) -> "Block":
         genesis = cls(
             index=0,

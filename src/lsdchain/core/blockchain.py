@@ -24,14 +24,19 @@ class Blockchain:
     def last_block(self) -> Block:
         return self.chain[-1]
 
+    ## Funções do saldo 
     def get_balance(self, address: str) -> float:
+        """Calcula o saldo de um endereço percorrendo toda a cadeia e as transações pendentes."""
+
         balance = 0.0
+        # Soma/Sub valores de todos os blocos já confirmados
         for block in self.chain:
             for tx in block.transactions:
                 if tx.destino == address:
                     balance += tx.valor
                 if tx.origem == address:
                     balance -= tx.valor
+        # Considera transacoes que estao na fila para evitar gasto duplo antes da mineracao
         for tx in self.pending_transactions:
             if tx.destino == address:
                 balance += tx.valor
@@ -40,6 +45,7 @@ class Blockchain:
         return balance
 
     def _get_chain_balances(self, target_chain: list[Block] | None = None) -> dict[str, float]:
+        """Gera um dicionario de saldos de todos os endereços de uma determinada corrente."""
         if target_chain is None:
             target_chain = self.chain
                     
@@ -48,22 +54,30 @@ class Blockchain:
             for tx in block.transactions:
                 balances[tx.destino] += tx.valor
                 balances[tx.origem] -= tx.valor
-            return balances
+        return balances
 
+    # funções pra gestão de transações
     def add_transaction(self, transaction: Transaction) -> bool:
-        if self._is_duplicate(transaction):
+        """Valida e add uma nova transacao ao pool de pendentes."""
+
+        if self._is_duplicate(transaction): ## msm id
             return False
-        if not self._validate_transaction_basic(transaction):
+        
+        if not self._validate_transaction_basic(transaction):# verifica campos básicos ( valores positivos e existencia de enderecos)
             return False
-        if transaction.origem == COINBASE_SENDER:
+        
+        if transaction.origem == COINBASE_SENDER: # só pode ser usado em transações de recompensa, não pode ser add diretamente no pool de pendentes
             return False
-        if transaction.origem not in (COINBASE_SENDER, "genesis"):
+        
+        if transaction.origem not in (COINBASE_SENDER, "genesis"):#Verifica se o remetente possui saldo suficiente (exceto no genesis)
             if self.get_balance(transaction.origem) < transaction.valor:
                 return False
+            
         self.pending_transactions.append(transaction)
         return True
 
     def _is_duplicate(self, transaction: Transaction) -> bool:
+        """Verifica se o ID da transacao ja existe nos pendentes ou na blockchain confirmada."""
         for tx in self.pending_transactions:
             if tx.id == transaction.id:
                 return True
@@ -74,12 +88,15 @@ class Blockchain:
         return False
 
     def _validate_transaction_basic(self, transaction: Transaction) -> bool:
+        """Checagem simples: valor deve ser positivo e campos de endereco preenchidos."""
         try:
             return transaction.valor > 0 and transaction.origem and transaction.destino
         except Exception:
             return False
 
+    ## gestão de bloco 
     def add_block(self, block: Block) -> bool:
+        """Valida e anexa um novo bloco minerado a corrente oficial."""
         if not self.is_valid_block(block):
             return False
 
@@ -91,7 +108,8 @@ class Blockchain:
         return True
 
     def is_valid_block(self, block: Block) -> bool:
-        if block.index != len(self.chain):
+        """Verifica se um bloco segue todas as regras de integridade e Proof of Work."""
+        if block.index != len(self.chain): # indice segue a ordem correta
             return False
         if block.previous_hash != self.last_block.hash:
             return False
@@ -104,6 +122,7 @@ class Blockchain:
         return True
 
     def _validate_block_transactions(self, block: Block, target_chain: list[Block] | None = None) -> bool:
+        """Valida a legalidade de todas as transacoes dentro de um bloco especifico."""
         if not block.transactions:
             return False
 
@@ -131,6 +150,7 @@ class Blockchain:
         return True
 
     def is_valid_chain(self, chain: list[Block]) -> bool:
+        """Valida uma blockchain completa (usado ao sincronizar com outros nós)."""
         if not chain:
             return False
         genesis = chain[0]
@@ -159,6 +179,7 @@ class Blockchain:
         return True
 
     def replace_chain(self, new_chain: list[Block]) -> bool:
+        """Implementa o consenso: a maior cadeia valida substitui a atual."""
         if len(new_chain) <= len(self.chain):
             return False
         if not self.is_valid_chain(new_chain):
